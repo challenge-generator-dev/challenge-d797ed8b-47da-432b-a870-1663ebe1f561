@@ -1,0 +1,61 @@
+<div class="orders-container">
+  <header class="orders-header">
+    <h1>Seguimiento de Órdenes</h1>
+    <p class="subtitle">Visualización en tiempo real del estado de tus órdenes</p>
+  </header>
+
+  <section class="orders-actions">
+    <button 
+      mat-raised-button 
+      color="primary"
+      (click)="publishTestEvent()"
+      [disabled]="isPublishing$ | async"
+      class="publish-btn">
+      <mat-icon>add</mat-icon>
+      Publicar Evento de Prueba
+    </button>
+    <span class="connection-status" [class.connected]="isConnected$ | async">
+      <mat-icon>{{ (isConnected$ | async) ? 'wifi' : 'wifi_off' }}</mat-icon>
+      {{ (isConnected$ | async) ? 'Conectado' : 'Desconectado' }}
+    </span>
+  </section>
+
+  <section class="events-list-container">
+    <div class="events-header">
+      <h2>Eventos Recientes</h2>
+      <span class="event-count">{{ (events$ | async)?.length || 0 }} eventos</span>
+    </div>
+
+    @if ((events$ | async)?.length === 0) {
+      <div class="empty-state">
+        <mat-icon>inbox</mat-icon>
+        <p>No hay eventos aún</p>
+        <span>Los eventos de órdenes aparecerán aquí en tiempo real</span>
+      </div>
+    } @else {
+      <div class="events-list">
+        @for (event of events$ | async; track event.id) {
+          <app-order-status 
+            [event]="event"
+            class="event-item">
+          </app-order-status>
+        } @empty {
+          <div class="empty-state">
+            <mat-icon>inbox</mat-icon>
+            <p>No hay eventos</p>
+          </div>
+        }
+      </div>
+    }
+  </section>
+
+  @if (error$ | async; as error) {
+    <div class="error-banner">
+      <mat-icon>error</mat-icon>
+      <span>{{ error }}</span>
+      <button mat-icon-button (click)="dismissError()">
+        <mat-icon>close</mat-icon>
+      </button>
+    </div>
+  }
+</div>
